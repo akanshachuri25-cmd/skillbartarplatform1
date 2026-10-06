@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SkillSwap — Skill Barter Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #FAF7FF;
+    color: #2A1F4D;
+  }
+  .display-font { font-family: 'Fraunces', Georgia, serif; }
+
+  header {
+    background: linear-gradient(135deg, #6C4CE0 0%, #8B5FE8 100%);
+    padding: 28px 24px;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 20px;
+  }
+  .brand h1 { color: white; margin: 0; font-size: 24px; line-height: 1; }
+  .brand p { color: rgba(255,255,255,0.75); margin: 4px 0 0; font-size: 12px; }
+  .header-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15); color: white;
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500;
+  }
+
+  main { max-width: 960px; margin: 0 auto; padding: 24px; }
+
+  .card {
+    background: white; border: 1px solid #E5DFF7; border-radius: 16px;
+    padding: 20px; margin-bottom: 20px;
+    box-shadow: 0 4px 20px -8px rgba(108,76,224,0.15);
+  }
+  .card-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .card-row h2 { margin: 0; font-size: 18px; }
+  .edit-btn {
+    font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 999px;
+    background: #F1ECFC; color: #6C4CE0; border: none; cursor: pointer;
+  }
+
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .skills-grid { grid-template-columns: 1fr; } }
+  .skills-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #8B7FB8; margin-bottom: 8px; }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px; font-weight: 500;
+    background: #F1ECFC; color: #6C4CE0; border: none; cursor: pointer; transition: all .15s ease;
+  }
+  .chip.teach-on { background: #3E9C6E; color: white; }
+  .chip.learn-on { background: #D65D8A; color: white; }
+  .chip:active { transform: scale(0.95); }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+    background: white; color: #6C4CE0; border: 1px solid #E5DFF7; cursor: pointer;
+  }
+  .tab-btn.active { background: #2A1F4D; color: white; border-color: #2A1F4D; }
+  .tab-badge {
+    font-size: 10px; font-weight: 700; padding: 0 6px; border-radius: 999px;
+    background: #D65D8A; color: white;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .match-card { background: white; border: 1px solid #E5DFF7; border-radius: 16px; padding: 16px; }
+  .avatar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 999px; color: white; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .user-name { font-weight: 600; font-size: 14px; margin: 0; }
+  .user-rating { font-size: 12px; color: #8B7FB8; display: flex; align-items: center; gap: 3px; margin-top: 2px; }
+  .match-line { font-size: 12px; margin: 4px 0; }
+  .match-line.give { color: #3E9C6E; }
+  .match-line.want { color: #D65D8A; }
+  .swap-btn {
+    width: 100%; margin-top: 10px; padding: 9px; border-radius: 12px; border: none;
+    background: #6C4CE0; color: white; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .swap-btn:disabled { background: #C9BEEF; cursor: default; }
+
+  .search-box {
+    display: flex; align-items: center; gap: 8px; background: white;
+    border: 1px solid #E5DFF7; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+  }
+  .search-box input { border: none; outline: none; background: transparent; width: 100%; font-size: 14px; color: #2A1F4D; }
+
+  .req-card {
+    background: white; border: 1px solid #E5DFF7; border-radius: 16px; padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  }
+  .req-left { display: flex; align-items: center; gap: 12px; }
+  .req-status { font-size: 12px; color: #8B7FB8; margin-top: 2px; }
+  .req-actions { display: flex; gap: 8px; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 999px; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .status-pill { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+
+  .empty-state { text-align: center; padding: 40px 0; color: #8B7FB8; font-size: 14px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #2A1F4D; color: white; padding: 10px 18px; border-radius: 999px;
+    font-size: 13px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; pointer-events: none;
+    transition: opacity .2s ease; z-index: 50;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">&#8646;</div>
+      <div>
+        <h1 class="display-font">SkillSwap</h1>
+        <p>Trade what you know for what you want to learn</p>
+      </div>
+    </div>
+    <div class="header-badge">&#128101; <span id="userCount"></span> students on campus</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- MY PROFILE -->
+  <div class="card">
+    <div class="card-row">
+      <h2 class="display-font">Your Skill Profile</h2>
+      <button class="edit-btn" id="editToggle">Done</button>
+    </div>
+    <div id="profileEdit" class="skills-grid">
+      <div>
+        <div class="skills-label">I can teach</div>
+        <div class="chip-wrap" id="teachChips"></div>
+      </div>
+      <div>
+        <div class="skills-label">I want to learn</div>
+        <div class="chip-wrap" id="learnChips"></div>
+      </div>
+    </div>
+    <div id="profileSummary" style="display:none; font-size:14px;">
+      <span><b>Teach:</b> <span id="summaryTeach"></span></span> &nbsp;&nbsp;
+      <span><b>Learn:</b> <span id="summaryLearn"></span></span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="matches">&#10024; Suggested Matches</button>
+    <button class="tab-btn" data-tab="directory">&#128269; Browse Directory</button>
+    <button class="tab-btn" data-tab="requests">&#8646; My Requests <span class="tab-badge" id="reqBadge" style="display:none;">0</span></button>
+  </div>
+
+  <!-- MATCHES TAB -->
+  <div id="tab-matches" class="grid2"></div>
+
+  <!-- DIRECTORY TAB -->
+  <div id="tab-directory" style="display:none;">
+    <div class="search-box">
+      &#128269; <input id="searchInput" placeholder="Search by name or skill" />
+    </div>
+    <div id="directoryGrid" class="grid2"></div>
+  </div>
+
+  <!-- REQUESTS TAB -->
+  <div id="tab-requests" style="display:none;"></div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const seedUsers = [
+    { id: "U1", name: "Riya Shah", offers: ["Excel", "Public Speaking"], wants: ["Python", "Video Editing"], rating: 4.8, sessions: 6 },
+    { id: "U2", name: "Aman Verma", offers: ["Python", "Guitar"], wants: ["Excel", "Photography"], rating: 4.5, sessions: 4 },
+    { id: "U3", name: "Priya Nair", offers: ["Photography", "Canva Design"], wants: ["Public Speaking", "Excel"], rating: 4.9, sessions: 9 },
+    { id: "U4", name: "Karan Mehta", offers: ["Video Editing", "Photoshop"], wants: ["Guitar", "Python"], rating: 4.2, sessions: 3 },
+    { id: "U5", name: "Sana Sheikh", offers: ["Public Speaking", "Content Writing"], wants: ["Photoshop", "Canva Design"], rating: 4.7, sessions: 5 },
+  ];
+  const skillOptions = ["Excel", "Python", "Photoshop", "Guitar", "Public Speaking", "Video Editing", "Photography", "Canva Design", "Content Writing"];
+  const AVATAR_COLORS = ["#7A5CFA", "#E0895C", "#3E9C6E", "#D65D8A", "#2F8FBF"];
+
+  let users = seedUsers;
+  let me = { name: "You", offers: ["Excel"], wants: ["Python"] };
+  let requests = [];
+  let editing = true;
+  let activeTab = "matches";
+  let query = "";
+
+  function initials(name) { return name.split(" ").map(p => p[0]).join("").slice(0,2).toUpperCase(); }
+  function avatarColor(id) { return AVATAR_COLORS[(id.charCodeAt(1) || 0) % AVATAR_COLORS.length]; }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2400);
+  }
+
+  function renderProfile() {
+    document.getElementById("userCount").textContent = users.length;
+    const teachWrap = document.getElementById("teachChips");
+    const learnWrap = document.getElementById("learnChips");
+    teachWrap.innerHTML = "";
+    learnWrap.innerHTML = "";
+    skillOptions.forEach(s => {
+      const b1 = document.createElement("button");
+      b1.className = "chip" + (me.offers.includes(s) ? " teach-on" : "");
+      b1.textContent = s;
+      b1.onclick = () => { toggle(me.offers, s); renderProfile(); renderMatches(); };
+      teachWrap.appendChild(b1);
+
+      const b2 = document.createElement("button");
+      b2.className = "chip" + (me.wants.includes(s) ? " learn-on" : "");
+      b2.textContent = s;
+      b2.onclick = () => { toggle(me.wants, s); renderProfile(); renderMatches(); };
+      learnWrap.appendChild(b2);
+    });
+    document.getElementById("profileEdit").style.display = editing ? "grid" : "none";
+    document.getElementById("profileSummary").style.display = editing ? "none" : "block";
+    document.getElementById("summaryTeach").textContent = me.offers.join(", ") || "—";
+    document.getElementById("summaryLearn").textContent = me.wants.join(", ") || "—";
+    document.getElementById("editToggle").textContent = editing ? "Done" : "Edit";
+  }
+
+  function toggle(list, skill) {
+    const i = list.indexOf(skill);
+    if (i >= 0) list.splice(i, 1); else list.push(skill);
+  }
+
+  function computeMatches() {
+    return users.map(u => {
+      const theyGiveMeWhatIWant = u.offers.filter(s => me.wants.includes(s));
+      const iGiveThemWhatTheyWant = me.offers.filter(s => u.wants.includes(s));
+      const score = theyGiveMeWhatIWant.length * 2 + iGiveThemWhatTheyWant.length;
+      return { ...u, theyGiveMeWhatIWant, iGiveThemWhatTheyWant, score };
+    }).filter(u => u.theyGiveMeWhatIWant.length > 0 || u.iGiveThemWhatTheyWant.length > 0)
+      .sort((a,b) => b.score - a.score);
+  }
+
+  function pendingRequestTo(userId) {
+    return requests.find(r => r.withUser.id === userId && r.status === "pending");
+  }
+
+  function sendRequest(user) {
+    if (pendingRequestTo(user.id)) { showToast(`Request to ${user.name} already sent.`); return; }
+    requests.unshift({ id: "R" + Date.now(), withUser: user, status: "pending" });
+    showToast(`Swap request sent to ${user.name}.`);
+    renderRequests();
+    renderMatches();
+    renderDirectory();
+  }
+
+  function respondRequest(id, accept) {
+    const r = requests.find(r => r.id === id);
+    if (r) r.status = accept ? "accepted" : "declined";
+    renderRequests();
+  }
+
+  function userCardHTML(u, extraLines) {
+    return `
+      <div class="match-card">
+        <div class="avatar-row">
+          <div class="avatar" style="background:${avatarColor(u.id)}">${initials(u.name)}</div>
+          <div>
+            <p class="user-name">${u.name}</p>
+            <div class="user-rating">&#9733; ${u.rating} ${u.sessions !== undefined ? "· " + u.sessions + " exchanges" : ""}</div>
+          </div>
+        </div>
+        ${extraLines}
+        <button class="swap-btn" ${pendingRequestTo(u.id) ? "disabled" : ""} onclick='sendRequest(${JSON.stringify(u).replace(/'/g,"&apos;")})'>
+          ${pendingRequestTo(u.id) ? "Request Sent" : "Send Swap Request"}
+        </button>
+      </div>`;
+  }
+
+  function renderMatches() {
+    const matches = computeMatches();
+    const el = document.getElementById("tab-matches");
+    if (matches.length === 0) {
+      el.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">No matches yet — add skills you can teach and want to learn in your profile above.</div>`;
+      return;
+    }
+    el.innerHTML = matches.map(u => {
+      let lines = "";
+      if (u.theyGiveMeWhatIWant.length) lines += `<p class="match-line give"><b>Can teach you:</b> ${u.theyGiveMeWhatIWant.join(", ")}</p>`;
+      if (u.iGiveThemWhatTheyWant.length) lines += `<p class="match-line want"><b>Wants to learn from you:</b> ${u.iGiveThemWhatTheyWant.join(", ")}</p>`;
+      return userCardHTML(u, lines);
+    }).join("");
+  }
+
+  function renderDirectory() {
+    const q = query.trim().toLowerCase();
+    const list = users.filter(u => !q || u.name.toLowerCase().includes(q) || u.offers.some(s => s.toLowerCase().includes(q)) || u.wants.some(s => s.toLowerCase().includes(q)));
+    const el = document.getElementById("directoryGrid");
+    el.innerHTML = list.map(u => userCardHTML(u,
+      `<p class="match-line give"><b>Teaches:</b> ${u.offers.join(", ")}</p><p class="match-line want"><b>Wants:</b> ${u.wants.join(", ")}</p>`
+    )).join("") || `<div class="empty-state" style="grid-column:1/-1;">No students match your search.</div>`;
+  }
+
+  function renderRequests() {
+    const el = document.getElementById("tab-requests");
+    const pending = requests.filter(r => r.status === "pending").length;
+    const badge = document.getElementById("reqBadge");
+    badge.style.display = pending ? "inline-block" : "none";
+    badge.textContent = pending;
+
+    if (requests.length === 0) {
+      el.innerHTML = `<div class="empty-state">No swap requests sent yet.</div>`;
+      return;
+    }
+    el.innerHTML = requests.map(r => `
+      <div class="req-card">
+        <div class="req-left">
+          <div class="avatar" style="width:36px;height:36px;font-size:11px;background:${avatarColor(r.withUser.id)}">${initials(r.withUser.name)}</div>
+          <div>
+            <p style="margin:0;font-size:14px;font-weight:500;">Swap with ${r.withUser.name}</p>
+            <p class="req-status">${r.status === "pending" ? "Waiting for their response…" : r.status === "accepted" ? "Accepted — arrange your session!" : "Declined"}</p>
+          </div>
+        </div>
+        ${r.status === "pending"
+          ? `<div class="req-actions">
+              <button class="icon-btn" style="background:#3E9C6E" onclick="respondRequest('${r.id}', true)">&#10003;</button>
+              <button class="icon-btn" style="background:#D65D8A" onclick="respondRequest('${r.id}', false)">&#10005;</button>
+             </div>`
+          : `<span class="status-pill" style="background:${r.status==='accepted' ? '#E4F5EC' : '#FCEAF0'}; color:${r.status==='accepted' ? '#3E9C6E' : '#D65D8A'}">${r.status}</span>`
+        }
+      </div>
+    `).join("");
+  }
+
+  document.getElementById("editToggle").onclick = () => { editing = !editing; renderProfile(); };
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeTab = btn.dataset.tab;
+      document.getElementById("tab-matches").style.display = activeTab === "matches" ? "grid" : "none";
+      document.getElementById("tab-directory").style.display = activeTab === "directory" ? "block" : "none";
+      document.getElementById("tab-requests").style.display = activeTab === "requests" ? "block" : "none";
+    };
+  });
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    query = e.target.value;
+    renderDirectory();
+  });
+
+  // init
+  renderProfile();
+  renderMatches();
+  renderDirectory();
+  renderRequests();
+</script>
+
+</body>
+</html>
